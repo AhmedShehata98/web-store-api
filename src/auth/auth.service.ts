@@ -1,5 +1,5 @@
+import { OtpVerificationService } from '../otp-verification/otpVerification.service';
 import { MailService } from './../mail/mail.service';
-import { OtpService } from './../otp/otp.service';
 import { CreateUserDTO } from './../dto/user.dto';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -14,8 +14,8 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private UserService: Model<User>,
     private jwtService: JwtService,
-    private OtpService: OtpService,
     private MailService: MailService,
+    private OtpVerificationService: OtpVerificationService,
   ) {}
 
   async create({
@@ -30,35 +30,41 @@ export class AuthService {
         createUserData.password,
         parseInt(process.env.SALT_ROUNDS),
       );
+
       const user = await new this.UserService({
         ...createUserData,
         password: hashedPassword,
       });
-      // const otpCode = await this.OtpService.createOtp({
-      //   email: user.email,
-      //   accountId: user._id.toString(),
-      // });
-      // if (otpCode) {
-      await this.MailService.SendUserEmailConfirmation({
+
+      await this.MailService.sendEmail({
         to: user.email,
         subject: `Web Store, this is a confirmation email address`,
-        context: { code: '45668', name: user.fullName },
-        template: 'confirm-email.hbs',
+        html: this.MailService.confirmEmailTemplate({
+          name: user.fullName,
+          otpCode: '123463',
+        }) as string,
       });
-      // }
 
-      // await user.save();
-      // const token = await this.jwtService.signAsync({ _id: user._id });
+      await user.save();
 
-      // res.cookie('token', token, {
-      //   httpOnly: true,
-      //   secure: true,
-      //   maxAge: 60 * 60 * 24 * 1000,
-      // });
+      // otp code
+      this.OtpVerificationService.createOTP({
+        email: user.email,
+        userId: user.id,
+      });
+
+      const token = await this.jwtService.signAsync({ _id: user._id });
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 60 * 60 * 24 * 1000,
+      });
       return {
         message: `hello ${user.fullName} in your WebStore Account, publish your web app and enjoy`,
       };
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(error);
     }
   }

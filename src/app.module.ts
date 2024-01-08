@@ -11,8 +11,7 @@ import { JWTConfigService } from './config/jwt.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailerLoaderService } from './config/nodemailer.service';
 import { MailModule } from './mail/mail.module';
-import { OtpService } from './otp/otp.service';
-import { OtpModule } from './otp/otp.module';
+import { OtpVerificationModule } from './otp-verification/otpVerification.module';
 
 @Module({
   imports: [
@@ -23,7 +22,7 @@ import { OtpModule } from './otp/otp.module';
     AuthModule,
     UsersModule,
     MailModule,
-    OtpModule,
+    OtpVerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

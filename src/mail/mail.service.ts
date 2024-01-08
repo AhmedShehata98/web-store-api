@@ -1,30 +1,41 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { join } from 'path';
+import { ErrorResponse, Resend } from 'resend';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  private _resend = new Resend(process.env.RESEND_SERVICE_API_KEY);
 
-  async SendUserEmailConfirmation({
-    context,
+  async sendEmail({
+    html,
     subject,
     to,
-    template,
   }: {
     to: string;
     subject: string;
-    context: {
-      name: string;
-      code: string;
-    };
-    template: string;
-  }) {
-    return await this.mailerService.sendMail({
+    html: string;
+  }): Promise<CreateEmailResponseSuccess | ErrorResponse> {
+    const { data, error } = await this._resend.emails.send({
+      from: process.env.MAIL_FROM,
       to,
       subject,
-      context,
-      template: join(__dirname, 'templates', template),
+      html,
     });
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
+  confirmEmailTemplate({ name, otpCode }: { name: string; otpCode: string }) {
+    return `
+      <b>hello dir : ${name}</b>
+      <br />
+      <p>this is e-mail verification to validate your email .</p>
+      <br />
+      <div>
+        <p>${otpCode}</p>
+      </div>
+    `;
   }
 }

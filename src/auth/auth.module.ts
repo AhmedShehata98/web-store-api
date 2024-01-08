@@ -5,10 +5,8 @@ import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema, User } from 'src/schemas/user.schema';
 import { JwtModule } from '@nestjs/jwt';
-// import { OtpService } from 'src/otp/otp.service';
-// import { MailService } from 'src/mail/mail.service';
-import { OtpModule } from 'src/otp/otp.module';
 import { MailModule } from 'src/mail/mail.module';
+import { OtpVerificationModule } from 'src/otp-verification/otpVerification.module';
 
 @Module({
   controllers: [AuthController],
@@ -17,7 +15,7 @@ import { MailModule } from 'src/mail/mail.module';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.registerAsync({ useClass: JWTConfigService }),
     MailModule,
-    OtpModule,
+    OtpVerificationModule,
   ],
 })
 export class AuthModule {}
