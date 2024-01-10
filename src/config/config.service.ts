@@ -8,6 +8,7 @@ export class WebStoreConfigService {
   ) {}
 
   getMongoConfig(): { uri: string; dbName: string } {
+    console.log(this._MongoUrl, this._MongoDatabaseName);
     return { uri: this._MongoUrl, dbName: this._MongoDatabaseName };
   }
 }

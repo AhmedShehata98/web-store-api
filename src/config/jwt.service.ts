@@ -10,7 +10,7 @@ export class JWTConfigService implements JwtOptionsFactory {
   createJwtOptions(): JwtModuleOptions | Promise<JwtModuleOptions> {
     return {
       secret: `${this.ConfigService.getOrThrow('JWT_SECRET_KEY')}`,
-      signOptions: { expiresIn: 24 },
+      signOptions: { expiresIn: '1 day' },
       global: true,
     };
   }

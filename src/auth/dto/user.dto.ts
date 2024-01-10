@@ -27,10 +27,18 @@ export class CreateUserDTO {
   jobTitle: string;
 
   @IsString()
-  @IsNotEmpty()
   country: string;
 
   @IsString()
+  usedFramework: string;
+}
+
+export class getUserDto {
+  @IsString()
   @IsNotEmpty()
-  userFramework: string;
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }

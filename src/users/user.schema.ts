@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { IUser } from './user.interface';
 
 export type UserDocument = HydratedDocument<IUser>;
 
@@ -24,13 +25,16 @@ export class User {
   country: string;
 
   @Prop({ required: true })
-  userFramework: string;
+  usedFramework: string;
 
   @Prop({ default: null, unique: true })
   githubProfileUrl: string | null;
 
   @Prop({ default: null, unique: true })
   linkedinProfileUrl: string | null;
+
+  @Prop({ default: false, type: Boolean })
+  isVerified: boolean;
 
   @Prop()
   createdAt: string;

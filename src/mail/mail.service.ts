@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ErrorResponse, Resend } from 'resend';
+import { CreateEmailResponseSuccess } from './mail.interface';
 
 @Injectable()
 export class MailService {
@@ -35,6 +36,22 @@ export class MailService {
       <br />
       <div>
         <p>${otpCode}</p>
+      </div>
+    `;
+  }
+
+  resetAccountPassword({ name, otpCode }: { name: string; otpCode: string }) {
+    return `
+      <div>
+        <center>This is a password reset request</center>
+        <span>
+          <p>  OTP code for ${name} is : </p>
+          <code>${otpCode}</code>
+          <br/>
+          <b>Sincerely,</b>
+          <br/>
+          <strong>Web Store Team</strong>
+        </span>
       </div>
     `;
   }
