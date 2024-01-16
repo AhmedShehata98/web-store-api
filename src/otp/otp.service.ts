@@ -26,7 +26,13 @@ export class OtpService {
         specialChars: false,
         digits: true,
       });
+      const oldOtpId = await this.OtpModal.exists({
+        $or: [{ accountId: userId }, { email }],
+      });
 
+      if (Boolean(oldOtpId)) {
+        await this.OtpModal.deleteOne({ _id: oldOtpId });
+      }
       const otp = await new this.OtpModal({
         accountId: userId,
         email,
@@ -35,7 +41,7 @@ export class OtpService {
 
       return await otp.save();
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 

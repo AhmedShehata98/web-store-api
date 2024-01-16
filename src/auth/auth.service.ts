@@ -62,14 +62,14 @@ export class AuthService {
       });
 
       const token = await this.setToken({ _id: user._id });
-      this.sendCookies({ res, data: token });
+      this.sendCookies({ res, name: 'token', data: token });
 
       return {
         message: `hello ${user.fullName} in your Web Store account, Publish your web app and enjoy`,
       };
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
@@ -92,11 +92,12 @@ export class AuthService {
         throw new ForbiddenException('Incorrect email or password , try again');
 
       const token = await this.setToken({ _id: user._id });
-      this.sendCookies({ res, data: token });
+
+      this.sendCookies({ res, name: 'token', data: token });
 
       return { message: `logged in successfully , welcome ${user.fullName}` };
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
@@ -125,7 +126,7 @@ export class AuthService {
 
       return await affectedUser.save();
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
@@ -147,7 +148,7 @@ export class AuthService {
         return isVerifiedUser;
       }
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
@@ -213,15 +214,15 @@ export class AuthService {
 
   async resetUserPassword({
     otpCode,
-    password,
+    newPassword,
   }: {
     otpCode: string;
-    password: string;
+    newPassword: string;
   }) {
     try {
       const checkOtpCode = await this.OtpService.getOtpCode({ otpCode });
       const hashedPassword = await bcrypt.hash(
-        password,
+        newPassword,
         parseInt(process.env.SALT_ROUNDS),
       );
       const modifiedUser = await this.UserService.findByIdAndUpdate(
@@ -235,15 +236,40 @@ export class AuthService {
 
       return 'password changed successfully';
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      throw error;
     }
   }
 
-  private sendCookies({ res, data }: { res: ExpressResponse; data: string }) {
-    res.cookie('token', data, {
+  async logout(res: ExpressResponse) {
+    try {
+      res.cookie('token', '', {
+        maxAge: 1,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+
+      res.end();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private sendCookies({
+    res,
+    name,
+    data,
+  }: {
+    res: ExpressResponse;
+    name: string;
+    data: any;
+  }) {
+    res.cookie(name, data, {
       maxAge: this.expiresDate,
       httpOnly: true,
       secure: true,
+      // domain: process.env.ORIGIN,
+      sameSite: 'none',
     });
   }
   private async getUser({

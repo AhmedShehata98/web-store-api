@@ -3,10 +3,12 @@ import { AuthService } from './auth.service';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   InternalServerErrorException,
   Post,
   Req,
+  Res,
   Response,
   UseGuards,
 } from '@nestjs/common';
@@ -41,11 +43,20 @@ export class AuthController {
     try {
       return await this.AuthService.read({ res, getUserData: loginData });
     } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('logout')
+  async handleLogout(@Res() res: ExpressResponse) {
+    try {
+      return await this.AuthService.logout(res);
+    } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  @Post('reset-password-request')
+  @Post('request-reset-password')
   @HttpCode(200)
   async handleResetPasswordRequest(@Body('email') email: string) {
     try {
@@ -58,11 +69,11 @@ export class AuthController {
   @Post('reset-password')
   @HttpCode(200)
   async handleResetPassword(
-    @Body('password') password: string,
+    @Body('newPassword') newPassword: string,
     @Body('otpCode') otpCode: string,
   ) {
     try {
-      return await this.AuthService.resetUserPassword({ otpCode, password });
+      return await this.AuthService.resetUserPassword({ otpCode, newPassword });
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
