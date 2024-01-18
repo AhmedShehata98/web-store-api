@@ -21,10 +21,10 @@ export class User {
   @Prop({ required: true })
   jobTitle: string;
 
-  @Prop({ required: true })
+  @Prop()
   country: string;
 
-  @Prop({ required: true })
+  @Prop()
   usedFramework: string;
 
   @Prop({ default: null, unique: true })
