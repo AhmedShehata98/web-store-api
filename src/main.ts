@@ -4,7 +4,10 @@ import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: { origin: 'http://localhost:3000', credentials: true },
+    cors: {
+      origin: ['http://localhost:3000', 'https://web-store-apps.vercel.app'],
+      credentials: true,
+    },
     bodyParser: true,
     rawBody: true,
   });
