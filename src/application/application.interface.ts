@@ -6,7 +6,12 @@ export interface IApplication {
   title: string;
   description: string;
   thumbnail: string;
-  images: Array<string>;
+  images: Array<{
+    _id: string;
+    src: string;
+    width: number;
+    height: number;
+  }>;
   review: IReview;
   category: ICategory;
   developer: IUser;

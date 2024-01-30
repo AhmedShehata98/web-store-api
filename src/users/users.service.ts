@@ -134,11 +134,11 @@ export class UsersService {
           'cannot find image file ,please provide a file',
         );
       const uploadImage = await this.uploadServices.uploadImage(file);
-      console.log(uploadImage);
-      if (uploadImage.secure_url) {
+
+      if (uploadImage.url) {
         const user = await this.userModel
           .findByIdAndUpdate(userId, {
-            profileImageUrl: uploadImage.secure_url,
+            profileImageUrl: uploadImage.url,
           })
           .select('profileImageUrl');
         await user.save();

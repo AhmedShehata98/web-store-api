@@ -7,26 +7,43 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Application } from './application.schema';
 import { IApplication } from './application.interface';
 import { Model } from 'mongoose';
+import { UploadService } from 'src/upload/upload.service';
+import { Category } from 'src/category/category.schema';
+import { User } from 'src/users/user.schema';
 
 @Injectable()
 export class ApplicationService {
   constructor(
     @InjectModel(Application.name)
     private applicationModel: Model<IApplication>,
+    private uploadService: UploadService,
   ) {}
 
   async create({
     createApplicationDto,
     userId,
+    images,
   }: {
     userId: string;
     createApplicationDto: CreateApplicationDto;
+    images: Express.Multer.File[];
   }) {
     try {
       const application = await new this.applicationModel({
         ...createApplicationDto,
         developer: userId,
-      });
+      }).populate([
+        {
+          path: 'category',
+          select: 'name',
+          model: Category.name,
+        },
+        {
+          path: 'developer',
+          select: 'fullName profileImageUrl',
+          model: User.name,
+        },
+      ]);
       await application.save();
       return application;
     } catch (error) {
@@ -35,9 +52,23 @@ export class ApplicationService {
   }
   async readById(applicationId: string) {
     try {
-      const application = await this.applicationModel.findOne({
-        _id: applicationId,
-      });
+      const application = await this.applicationModel
+        .findOne({
+          _id: applicationId,
+        })
+        .populate([
+          {
+            path: 'category',
+            select: 'name',
+            model: Category.name,
+          },
+          {
+            path: 'developer',
+            select:
+              'fullName profileImageUrl githubProfileUrl linkedinProfileUrl',
+            model: User.name,
+          },
+        ]);
       return application;
     } catch (error) {
       throw error;
@@ -46,7 +77,21 @@ export class ApplicationService {
   async readMany({ limit, page }: { limit: number; page: number }) {
     try {
       const skip = limit * (page - 1);
-      const application = await this.applicationModel.find().skip(skip);
+      const application = await this.applicationModel
+        .find()
+        .skip(skip)
+        .populate([
+          {
+            path: 'category',
+            select: 'name',
+            model: Category.name,
+          },
+          {
+            path: 'developer',
+            select: 'fullName profileImageUrl',
+            model: User.name,
+          },
+        ]);
       const count = await this.applicationModel.countDocuments();
 
       return { application, total: count, currentPage: page, limit };

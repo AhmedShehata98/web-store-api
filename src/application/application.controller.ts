@@ -18,6 +18,12 @@ import {
   CreateApplicationDto,
   UpdateApplicationDto,
 } from './dto/application.dto';
+import {
+  FileInterceptor,
+  FilesInterceptor,
+  NoFilesInterceptor,
+} from '@nestjs/platform-express';
+import { FormDataRequest } from 'nestjs-form-data';
 
 @Controller('application')
 export class ApplicationController {
@@ -46,6 +52,7 @@ export class ApplicationController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @FormDataRequest()
   async handleAddNewApplication(
     @Req() req: ExpressRequest,
     @Body() createApplicationDto: CreateApplicationDto,
@@ -55,6 +62,7 @@ export class ApplicationController {
       return await this.applicationService.create({
         userId,
         createApplicationDto,
+        images: [],
       });
     } catch (error) {
       throw new InternalServerErrorException(error);

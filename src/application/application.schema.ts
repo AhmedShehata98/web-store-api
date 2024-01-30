@@ -15,11 +15,24 @@ export class Application {
   @Prop({ type: String, default: null })
   description: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   thumbnail: string;
 
-  @Prop({ type: Array<String>, default: [] })
-  images: Array<string>;
+  @Prop({
+    type: [
+      {
+        url: String,
+        width: Number,
+        height: Number,
+      },
+    ],
+    default: [],
+  })
+  images: {
+    url: string;
+    width: number;
+    height: number;
+  }[];
 
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Review', default: [] }])
   review: Review;

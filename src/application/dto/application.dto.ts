@@ -9,13 +9,15 @@ export class CreateApplicationDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsEmpty()
   @IsUrl()
   thumbnail: string;
 
-  @IsEmpty()
-  @IsArray()
-  images: Array<string>;
+  images: Array<{
+    width: number;
+    height: number;
+    url: string;
+  }>;
 
   @IsEmpty()
   @IsString()
@@ -61,7 +63,12 @@ export class UpdateApplicationDto {
 
   @IsEmpty()
   @IsArray()
-  images: Array<string>;
+  images: Array<{
+    _id: string;
+    src: string;
+    width: number;
+    height: number;
+  }>;
 
   @IsEmpty()
   @IsUrl()

@@ -5,6 +5,8 @@ import { Application, ApplicationSchema } from './application.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { JWTConfigService } from 'src/config/jwt.service';
 import { ApplicationController } from './application.controller';
+import { UploadModule } from 'src/upload/upload.module';
+import { NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { ApplicationController } from './application.controller';
       { name: Application.name, schema: ApplicationSchema },
     ]),
     JwtModule.registerAsync({ useClass: JWTConfigService }),
+    UploadModule,
+    NestjsFormDataModule,
   ],
   providers: [ApplicationService],
   controllers: [ApplicationController],
