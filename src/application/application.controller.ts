@@ -41,6 +41,23 @@ export class ApplicationController {
     }
   }
 
+  @Get('category/:categoryId')
+  async getApplicationByCategory(
+    @Query('limit', { transform: (value) => parseInt(value) }) limit: number,
+    @Query('page', { transform: (value) => parseInt(value) }) page: number,
+    @Param('categoryId') categoryId: string,
+  ) {
+    try {
+      return await this.applicationService.readByCategoryId({
+        categoryId,
+        limit,
+        page,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
   @Get('/:applicationId')
   async handleGetApplication(@Param('applicationId') applicationId: string) {
     try {

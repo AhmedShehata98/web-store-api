@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { Category } from './category.schema';
 import { Model } from 'mongoose';
 import { ICategory } from './category.interface';
+import { uid } from 'uid';
+import { isObjectId } from 'src/utils/is-valid-objectId';
 
 @Injectable()
 export class CategoryService {
@@ -13,7 +15,13 @@ export class CategoryService {
 
   async read(categoryId: string) {
     try {
-      const category = await this.categoryModel.findOne({ _id: categoryId });
+      if (isObjectId(categoryId)) {
+        const category = await this.categoryModel.findById(categoryId);
+        return category;
+      }
+      const category = await this.categoryModel.findOne({
+        shortId: categoryId,
+      });
       return category;
     } catch (error) {
       throw error;
@@ -30,7 +38,10 @@ export class CategoryService {
   }
   async create(createCategoryDto: CreateCategoryDto) {
     try {
-      const category = await new this.categoryModel({ ...createCategoryDto });
+      const category = await new this.categoryModel({
+        ...createCategoryDto,
+        shortId: uid(8),
+      });
       await category.save();
       return category;
     } catch (error) {

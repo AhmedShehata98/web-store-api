@@ -3,6 +3,7 @@ import { IReview } from 'src/review/review.interface';
 import { IUser } from 'src/users/user.interface';
 
 export interface IApplication {
+  shortId: string;
   title: string;
   description: string;
   thumbnail: string;

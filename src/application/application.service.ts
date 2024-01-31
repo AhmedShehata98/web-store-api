@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { UploadService } from 'src/upload/upload.service';
 import { Category } from 'src/category/category.schema';
 import { User } from 'src/users/user.schema';
+import { uid } from 'uid';
 
 @Injectable()
 export class ApplicationService {
@@ -32,6 +33,7 @@ export class ApplicationService {
       const application = await new this.applicationModel({
         ...createApplicationDto,
         developer: userId,
+        shortId: uid(8),
       }).populate([
         {
           path: 'category',
@@ -54,7 +56,7 @@ export class ApplicationService {
     try {
       const application = await this.applicationModel
         .findOne({
-          _id: applicationId,
+          shortId: applicationId,
         })
         .populate([
           {
@@ -95,6 +97,31 @@ export class ApplicationService {
       const count = await this.applicationModel.countDocuments();
 
       return { application, total: count, currentPage: page, limit };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async readByCategoryId({
+    categoryId,
+    limit,
+    page,
+  }: {
+    categoryId: string;
+    limit: number;
+    page: number;
+  }) {
+    try {
+      const skip = (page - 1) * limit;
+      const applications = await this.applicationModel
+        .find({ shortId: categoryId })
+        .skip(skip);
+      const count = await this.applicationModel.countDocuments();
+      return {
+        applications,
+        total: count,
+        currentPage: page,
+        limit,
+      };
     } catch (error) {
       throw error;
     }
