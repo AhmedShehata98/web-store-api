@@ -44,22 +44,23 @@ export class AuthService {
         password: hashedPassword,
       });
       await user.save();
-
+      // disabled confirmation email temporary
+      //
       // Create otp code
-      const otp = await this.OtpService.createOtpCode({
-        email: user.email,
-        userId: user.id,
-      });
+      // const otp = await this.OtpService.createOtpCode({
+      //   email: user.email,
+      //   userId: user.id,
+      // });
 
       // send verification email
-      await this.MailService.sendEmail({
-        to: user.email,
-        subject: `Web Store, this is a confirmation email address`,
-        html: this.MailService.confirmEmailTemplate({
-          name: user.fullName,
-          otpCode: otp.otpCode,
-        }) as string,
-      });
+      // await this.MailService.sendEmail({
+      //   to: user.email,
+      //   subject: `Web Store, this is a confirmation email address`,
+      //   html: this.MailService.confirmEmailTemplate({
+      //     name: user.fullName,
+      //     otpCode: otp.otpCode,
+      //   }) as string,
+      // });
 
       const token = await this.setToken({ _id: user._id });
       this.sendCookies({ res, name: 'token', data: token });
@@ -68,7 +69,6 @@ export class AuthService {
         message: `hello ${user.fullName} in your Web Store account, Publish your web app and enjoy`,
       };
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
