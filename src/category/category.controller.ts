@@ -42,7 +42,7 @@ export class CategoryController {
   @Get(':categoryId')
   async handleGetCategoryById(@Param('categoryId') categoryId: string) {
     try {
-      return await this.categoryService.read(categoryId);
+      return await this.categoryService.readById(categoryId);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }

@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Application } from './application.schema';
 import { IApplication } from './application.interface';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { UploadService } from 'src/upload/upload.service';
 import { Category } from 'src/category/category.schema';
 import { User } from 'src/users/user.schema';
@@ -79,7 +79,7 @@ export class ApplicationService {
   async readMany({ limit, page }: { limit: number; page: number }) {
     try {
       const skip = limit * (page - 1);
-      const application = await this.applicationModel
+      const applications = await this.applicationModel
         .find()
         .skip(skip)
         .populate([
@@ -96,7 +96,7 @@ export class ApplicationService {
         ]);
       const count = await this.applicationModel.countDocuments();
 
-      return { application, total: count, currentPage: page, limit };
+      return { applications, total: count, currentPage: page, limit };
     } catch (error) {
       throw error;
     }
@@ -111,10 +111,25 @@ export class ApplicationService {
     page: number;
   }) {
     try {
-      const skip = (page - 1) * limit;
+      const skip = limit * (page - 1);
+
       const applications = await this.applicationModel
-        .find({ shortId: categoryId })
-        .skip(skip);
+        .find({ category: categoryId })
+        .populate([
+          {
+            path: 'category',
+            select: 'name shortId description',
+            model: Category.name,
+          },
+          {
+            path: 'developer',
+            select: 'fullName profileImageUrl',
+            model: User.name,
+          },
+        ])
+        .skip(skip)
+        .lean();
+
       const count = await this.applicationModel.countDocuments();
       return {
         applications,

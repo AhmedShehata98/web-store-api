@@ -27,6 +27,14 @@ export class CategoryService {
       throw error;
     }
   }
+  async readById(categoryId: string) {
+    try {
+      const category = await this.categoryModel.findOne({ _id: categoryId });
+      return category;
+    } catch (error) {
+      throw error;
+    }
+  }
   async readMany({ limit = 8, page = 1 }: { limit: number; page: number }) {
     try {
       const skip = limit * (page - 1);
