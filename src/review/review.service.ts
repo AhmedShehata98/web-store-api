@@ -4,6 +4,7 @@ import { Review } from './review.schema';
 import { Model } from 'mongoose';
 import { IReview } from './review.interface';
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
+import { User } from 'src/users/user.schema';
 
 @Injectable()
 export class ReviewService {
@@ -11,15 +12,15 @@ export class ReviewService {
 
   async create({
     createReviewDto,
-    itemId,
+    shortId,
   }: {
-    itemId: string;
+    shortId: string;
     createReviewDto: CreateReviewDto;
   }) {
     try {
       const review = await new this.ReviewModel({
         ...createReviewDto,
-        itemId,
+        applicationShortId: shortId,
       });
       await review.save();
       return review;
@@ -28,18 +29,66 @@ export class ReviewService {
     }
   }
 
-  async read(itemId: string) {
+  async readMany({
+    limit,
+    page,
+    shortId,
+  }: {
+    shortId: string;
+    limit: number;
+    page: number;
+  }) {
     try {
-      const review = await this.ReviewModel.find({ _id: itemId });
-      return review;
+      const skip = (page - 1) * limit;
+      const review = await this.ReviewModel.find({
+        applicationShortId: shortId,
+      })
+        .skip(skip)
+        .populate({
+          path: 'user',
+          select: 'fullName profileImageUrl jobTitle usedFramework',
+          model: User.name,
+        })
+        .lean();
+
+      const count = await this.ReviewModel.countDocuments();
+      return {
+        reviews: review,
+        actualCount: count,
+        page,
+        limit,
+        remainingPages: limit / count,
+      };
     } catch (error) {
       throw error;
     }
   }
 
-  async delete(itemId: string) {
+  async getRecentReview(shortId: string) {
     try {
-      const review = await this.ReviewModel.findByIdAndDelete({ _id: itemId });
+      const recentReview = await this.ReviewModel.findOne({
+        applicationShortId: shortId,
+      })
+        .sort({ createdAt: -1 })
+        .populate([
+          {
+            path: 'user',
+            select: 'fullName profileImageUrl',
+            model: User.name,
+          },
+        ])
+        .lean();
+      return recentReview;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete(reviewId: string) {
+    try {
+      const review = await this.ReviewModel.findByIdAndDelete({
+        _id: reviewId,
+      });
       return review;
     } catch (error) {
       throw error;
@@ -47,15 +96,15 @@ export class ReviewService {
   }
 
   async update({
-    itemId,
+    reviewId,
     updateReviewDto,
   }: {
-    itemId: string;
+    reviewId: string;
     updateReviewDto: UpdateReviewDto;
   }) {
     try {
       const review = await this.ReviewModel.findByIdAndUpdate(
-        { _id: itemId },
+        { _id: reviewId },
         { ...updateReviewDto },
       );
       await review.save();

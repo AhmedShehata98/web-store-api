@@ -76,6 +76,7 @@ export class ApplicationService {
       throw error;
     }
   }
+
   async readMany({ limit, page }: { limit: number; page: number }) {
     try {
       const skip = limit * (page - 1);
@@ -141,6 +142,7 @@ export class ApplicationService {
       throw error;
     }
   }
+
   async update({
     applicationId,
     updateApplicationDto,

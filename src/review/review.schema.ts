@@ -18,8 +18,10 @@ export class Review {
   @Prop({ type: Number, required: true })
   rate: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Application' })
-  applicationId: Application;
+  // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Application' })
+  // applicationId: Application;
+  @Prop({ type: String, ref: 'Application' })
+  applicationShortId: string;
 
   @Prop({ type: String, required: true })
   comment: string;

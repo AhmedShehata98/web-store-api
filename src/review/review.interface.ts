@@ -5,7 +5,8 @@ export interface IReview {
   user: IUser;
   rate: number;
   comment: string;
-  itemId: string;
+  // applicationId: string;
+  applicationShortId: string;
   createdAt: string;
   updatedAt: string;
 }
