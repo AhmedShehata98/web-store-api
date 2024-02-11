@@ -37,7 +37,7 @@ export class ReviewService {
     shortId: string;
     limit: number;
     page: number;
-  }) {
+  }): Promise<IPaginationObject<IReview[]>> {
     try {
       const skip = (page - 1) * limit;
       const review = await this.ReviewModel.find({
@@ -53,11 +53,12 @@ export class ReviewService {
 
       const count = await this.ReviewModel.countDocuments();
       return {
-        reviews: review,
-        actualCount: count,
-        page,
+        data: review,
+        total: count,
+        currentPage: page,
         limit,
-        remainingPages: limit / count,
+        remainingPages: Math.round(count / limit),
+        hasNext: Boolean(Math.round(count / limit) > 0),
       };
     } catch (error) {
       throw error;

@@ -18,7 +18,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwtAuth.guard';
 export class ReviewController {
   constructor(private reviewService: ReviewService) {}
 
-  @Get('/:shortId')
+  @Get('all/:shortId')
   async handleGetReviews(
     @Param('shortId') shortId: string,
     @Query('limit', { transform: (val) => parseInt(val) }) limit: number,

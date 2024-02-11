@@ -64,7 +64,12 @@ export class AuthService {
 
       const token = await this.setToken({ _id: user._id });
       this.sendCookies({ res, name: 'token', data: token });
-
+      res.cookie('isLoggedIn', true, {
+        maxAge: this.expiresDate,
+        httpOnly: false,
+        secure: true,
+        sameSite: 'none',
+      });
       return {
         message: `hello ${user.fullName} in your Web Store account, Publish your web app and enjoy`,
       };
@@ -94,6 +99,12 @@ export class AuthService {
       const token = await this.setToken({ _id: user._id });
 
       this.sendCookies({ res, name: 'token', data: token });
+      res.cookie('isLoggedIn', true, {
+        maxAge: this.expiresDate,
+        httpOnly: false,
+        secure: true,
+        sameSite: 'none',
+      });
 
       return { message: `logged in successfully , welcome ${user.fullName}` };
     } catch (error) {
